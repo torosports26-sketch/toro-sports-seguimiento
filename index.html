@@ -131,7 +131,7 @@
   </main>
 
   <script>
-    // LOGO OFICIAL
+    // LOGO OFICIAL DE TORO SPORTS
     const nombreLogo = "New Logo blanco (1).png";
 
     document.getElementById("logo-toro").src =
@@ -177,8 +177,9 @@
         window.location.search
       ).get("token");
 
+      // VALIDACION CORREGIDA DEL TOKEN
       const uuid =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
       if (!token || !uuid.test(token)) {
         resultado.textContent =
@@ -186,7 +187,10 @@
         return;
       }
 
-      if (SUPABASE_KEY === "PEGA_AQUI_TU_CLAVE_PUBLICABLE") {
+      if (
+        SUPABASE_KEY ===
+        "PEGA_AQUI_TU_CLAVE_PUBLICABLE"
+      ) {
         resultado.textContent =
           "Falta configurar la clave publicable de Supabase.";
         return;
@@ -223,10 +227,29 @@
         const tarjeta = document.createElement("div");
         tarjeta.className = "tarjeta";
 
-        agregarFila(tarjeta, "Cliente", pedido.cliente);
-        agregarFila(tarjeta, "N.º de pedido", pedido.numero_pedido);
-        agregarFila(tarjeta, "Productos", pedido.productos);
-        agregarFila(tarjeta, "Estado", pedido.estado);
+        agregarFila(
+          tarjeta,
+          "Cliente",
+          pedido.cliente
+        );
+
+        agregarFila(
+          tarjeta,
+          "N.º de pedido",
+          pedido.numero_pedido
+        );
+
+        agregarFila(
+          tarjeta,
+          "Productos",
+          pedido.productos
+        );
+
+        agregarFila(
+          tarjeta,
+          "Estado",
+          pedido.estado
+        );
 
         agregarFila(
           tarjeta,
@@ -243,6 +266,8 @@
         resultado.replaceWith(tarjeta);
 
       } catch (error) {
+        console.error("Error al consultar:", error);
+
         resultado.textContent =
           "No pudimos consultar el pedido. Intentá nuevamente.";
       }
