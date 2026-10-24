@@ -605,20 +605,11 @@
 
       fechas.append(inicio, fin);
 
-      const aviso = crearElemento(
-        "p",
-        "aviso",
-        "La barra muestra el tiempo transcurrido " +
-        "hasta la fecha estimada de entrega. " +
-        "No representa el avance real de fabricación."
-      );
-
       tarjeta.append(
         progresoNumero,
         subtitulo,
         barraFondo,
-        fechas,
-        aviso
+        fechas
       );
 
       return tarjeta;
@@ -739,7 +730,7 @@
       ).get("token");
 
       const uuid =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
       if (!token || !uuid.test(token)) {
         resultado.textContent =
