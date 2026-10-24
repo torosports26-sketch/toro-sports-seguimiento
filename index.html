@@ -14,28 +14,31 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       background: #080808;
       color: #ffffff;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     main {
       max-width: 550px;
-      margin: 60px auto;
+      margin: 50px auto;
       padding: 25px;
     }
 
     .marca {
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       margin-bottom: 35px;
     }
 
     .logo {
+      display: block;
       width: 150px;
       max-width: 100%;
       height: auto;
-      display: block;
-      margin: 0 auto;
+      object-fit: contain;
     }
 
     h1 {
@@ -85,6 +88,21 @@
       margin-top: 35px;
       font-size: 12px;
     }
+
+    @media (max-width: 480px) {
+      main {
+        margin: 25px auto;
+        padding: 20px;
+      }
+
+      .tarjeta {
+        padding: 18px;
+      }
+
+      .fila {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 
@@ -93,9 +111,9 @@
 
     <div class="marca">
       <img
-        src="New%20Logo%20blanco%20%281%29.png"
-        alt="Toro Sports"
+        id="logo-toro"
         class="logo"
+        alt="Toro Sports"
       >
     </div>
 
@@ -112,11 +130,18 @@
   </main>
 
   <script>
+    // LOGO OFICIAL DE TORO SPORTS
+    const nombreLogo = "New Logo blanco (1).png";
+
+    document.getElementById("logo-toro").src =
+      "./" + encodeURIComponent(nombreLogo);
+
+    // CONEXION CON SUPABASE
     const SUPABASE_URL =
       "https://naxhcvjrxhirfizhitsp.supabase.co";
 
     const SUPABASE_KEY =
-      "PEGA_AQUI_TU_CLAVE_PUBLICABLE";
+      "sb_publishable_sFSH8qeq6HweNdtkZJ8AmA_kUUhghEj";
 
     const resultado = document.getElementById("resultado");
 
@@ -157,6 +182,12 @@
       if (!token || !uuid.test(token)) {
         resultado.textContent =
           "El enlace de seguimiento no es válido.";
+        return;
+      }
+
+      if (SUPABASE_KEY === "PEGA_AQUI_TU_CLAVE_PUBLICABLE") {
+        resultado.textContent =
+          "Falta configurar la clave publicable de Supabase.";
         return;
       }
 
