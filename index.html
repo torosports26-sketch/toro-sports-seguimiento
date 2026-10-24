@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
+
   <title>Seguimiento de pedido | Toro Sports</title>
 
   <style>
@@ -130,7 +131,7 @@
   </main>
 
   <script>
-    // LOGO OFICIAL DE TORO SPORTS
+    // LOGO OFICIAL
     const nombreLogo = "New Logo blanco (1).png";
 
     document.getElementById("logo-toro").src =
@@ -177,7 +178,7 @@
       ).get("token");
 
       const uuid =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
       if (!token || !uuid.test(token)) {
         resultado.textContent =
@@ -225,13 +226,14 @@
         agregarFila(tarjeta, "Cliente", pedido.cliente);
         agregarFila(tarjeta, "N.º de pedido", pedido.numero_pedido);
         agregarFila(tarjeta, "Productos", pedido.productos);
-        agregarFila(tarjeta, "Cantidad", pedido.cantidad);
         agregarFila(tarjeta, "Estado", pedido.estado);
+
         agregarFila(
           tarjeta,
           "Fecha del pedido",
           fecha(pedido.fecha_pedido)
         );
+
         agregarFila(
           tarjeta,
           "Entrega estimada",
