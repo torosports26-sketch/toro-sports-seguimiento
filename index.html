@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seguimiento de pedidos | Toro Sports</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .contenedor {
+      max-width: 620px;
+      margin: 60px auto;
+      padding: 24px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      margin-bottom: 40px;
+    }
+    .tarjeta {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: left;
+    }
+    h1 { font-size: 26px; text-align: center; }
+    .dato {
+      padding: 14px 0;
+      border-bottom: 1px solid #333;
+    }
+    .etiqueta {
+      display: block;
+      color: #aaa;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .valor { font-size: 17px; }
+    .estado {
+      color: #fff;
+      font-weight: bold;
+    }
+    .mensaje {
+      text-align: center;
+      color: #aaa;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <main class="contenedor">
+    <div class="logo">TORO SPORTS</div>
+    <h1>Seguimiento de pedido</h1>
+    <div id="resultado" class="mensaje">
+      Preparando consulta...
+    </div>
+  </main>
+  <script>
+    document.getElementById("resultado").textContent =
+      "Próximamente podrás consultar tu pedido aquí.";
+  </script>
+</body>
+</html>
