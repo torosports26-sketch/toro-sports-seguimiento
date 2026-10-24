@@ -1,72 +1,159 @@
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Seguimiento de pedidos | Toro Sports</title>
+  <title>Seguimiento de pedido | Toro Sports</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #000;
-      color: #fff;
+      background: #080808;
+      color: white;
       font-family: Arial, sans-serif;
     }
-    .contenedor {
-      max-width: 620px;
+    main {
+      max-width: 550px;
       margin: 60px auto;
-      padding: 24px;
-      text-align: center;
+      padding: 25px;
     }
-    .logo {
-      font-size: 30px;
+    .marca {
+      text-align: center;
+      font-size: 26px;
       font-weight: 900;
-      letter-spacing: 3px;
-      margin-bottom: 40px;
+      letter-spacing: 4px;
+      margin-bottom: 35px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 30px;
     }
     .tarjeta {
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 16px;
-      padding: 28px;
-      text-align: left;
+      background: #191919;
+      border: 1px solid #303030;
+      border-radius: 14px;
+      padding: 25px;
     }
-    h1 { font-size: 26px; text-align: center; }
-    .dato {
-      padding: 14px 0;
+    .fila {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 13px 0;
       border-bottom: 1px solid #333;
     }
-    .etiqueta {
-      display: block;
-      color: #aaa;
-      font-size: 13px;
-      margin-bottom: 6px;
-    }
-    .valor { font-size: 17px; }
-    .estado {
-      color: #fff;
-      font-weight: bold;
-    }
-    .mensaje {
+    .fila:last-child { border-bottom: none; }
+    .etiqueta { color: #aaa; }
+    .valor { text-align: right; font-weight: bold; }
+    .mensaje { text-align: center; color: #bbb; }
+    footer {
       text-align: center;
-      color: #aaa;
-      margin-top: 20px;
+      color: #777;
+      margin-top: 35px;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-  <main class="contenedor">
-    <div class="logo">TORO SPORTS</div>
+  <main>
+    <div class="marca">TORO SPORTS</div>
     <h1>Seguimiento de pedido</h1>
-    <div id="resultado" class="mensaje">
-      Preparando consulta...
-    </div>
+    <div id="resultado" class="mensaje">Consultando pedido...</div>
+    <footer>TORO SPORTS · Seguimiento de pedidos</footer>
   </main>
+
   <script>
-    document.getElementById("resultado").textContent =
-      "Próximamente podrás consultar tu pedido aquí.";
+    const SUPABASE_URL =
+      "https://naxhcvjrxhirfizhitsp.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_sFSH8qeq6HweNdtkZJ8AmA_kUUhghEj";
+
+    const resultado = document.getElementById("resultado");
+
+    function agregarFila(contenedor, etiqueta, valor) {
+      const fila = document.createElement("div");
+      fila.className = "fila";
+
+      const izquierda = document.createElement("span");
+      izquierda.className = "etiqueta";
+      izquierda.textContent = etiqueta;
+
+      const derecha = document.createElement("span");
+      derecha.className = "valor";
+      derecha.textContent = valor ?? "—";
+
+      fila.append(izquierda, derecha);
+      contenedor.appendChild(fila);
+    }
+
+    function fecha(valor) {
+      if (!valor) return "—";
+      const partes = valor.split("-");
+      return partes.length === 3
+        ? `${partes[2]}/${partes[1]}/${partes[0]}`
+        : valor;
+    }
+
+    async function consultarPedido() {
+      const token = new URLSearchParams(
+        window.location.search
+      ).get("token");
+
+      const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      if (!token || !uuid.test(token)) {
+        resultado.textContent =
+          "El enlace de seguimiento no es válido.";
+        return;
+      }
+
+      try {
+        const respuesta = await fetch(
+          `${SUPABASE_URL}/rest/v1/rpc/consultar_pedido`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_KEY
+            },
+            body: JSON.stringify({ p_token: token })
+          }
+        );
+
+        if (!respuesta.ok) {
+          throw new Error("Error de consulta");
+        }
+
+        const datos = await respuesta.json();
+        const pedido = datos[0];
+
+        if (!pedido) {
+          resultado.textContent =
+            "No encontramos un pedido con este enlace.";
+          return;
+        }
+
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "tarjeta";
+
+        agregarFila(tarjeta, "Cliente", pedido.cliente);
+        agregarFila(tarjeta, "N.º de pedido", pedido.numero_pedido);
+        agregarFila(tarjeta, "Productos", pedido.productos);
+        agregarFila(tarjeta, "Cantidad", pedido.cantidad);
+        agregarFila(tarjeta, "Estado", pedido.estado);
+        agregarFila(tarjeta, "Fecha del pedido", fecha(pedido.fecha_pedido));
+        agregarFila(tarjeta, "Entrega estimada", fecha(pedido.fecha_entrega));
+
+        resultado.replaceWith(tarjeta);
+      } catch (error) {
+        resultado.textContent =
+          "No pudimos consultar el pedido. Intentá nuevamente.";
+      }
+    }
+
+    consultarPedido();
   </script>
 </body>
 </html>
