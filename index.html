@@ -22,9 +22,9 @@
     }
 
     main {
-      max-width: 550px;
-      margin: 50px auto;
-      padding: 25px;
+      max-width: 590px;
+      margin: 45px auto;
+      padding: 22px;
     }
 
     .marca {
@@ -44,15 +44,21 @@
 
     h1 {
       text-align: center;
-      font-size: 24px;
-      margin-bottom: 30px;
+      font-size: 25px;
+      margin: 0 0 30px;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin: 0 0 18px;
     }
 
     .tarjeta {
       background: #191919;
       border: 1px solid #303030;
-      border-radius: 14px;
-      padding: 25px;
+      border-radius: 15px;
+      padding: 24px;
+      margin-bottom: 18px;
     }
 
     .fila {
@@ -77,6 +83,150 @@
       overflow-wrap: anywhere;
     }
 
+    .estado {
+      display: inline-block;
+      padding: 8px 12px;
+      background: #303030;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .progreso-numero {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 0 7px;
+    }
+
+    .progreso-subtitulo {
+      font-size: 12px;
+      color: #aaaaaa;
+      margin-bottom: 17px;
+    }
+
+    .barra-fondo {
+      height: 12px;
+      background: #393939;
+      border-radius: 30px;
+      overflow: hidden;
+    }
+
+    .barra-relleno {
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      border-radius: 30px;
+      transition: width 0.6s ease;
+    }
+
+    .fechas {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .fecha-bloque {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .fecha-bloque:last-child {
+      text-align: right;
+    }
+
+    .fecha-etiqueta {
+      color: #999999;
+      font-size: 12px;
+    }
+
+    .fecha-valor {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .aviso {
+      margin-top: 20px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #999999;
+    }
+
+    .pago-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0 20px;
+      border-bottom: 1px solid #333333;
+    }
+
+    .pago-total .importe {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .pago-fila {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 0;
+      border-bottom: 1px solid #333333;
+    }
+
+    .pago-fila:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .pago-detalle {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .pago-nombre {
+      font-weight: bold;
+    }
+
+    .pago-descripcion {
+      color: #aaaaaa;
+      font-size: 12px;
+    }
+
+    .pago-derecha {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      text-align: right;
+    }
+
+    .importe {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .insignia {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .pagado {
+      color: #8ee0aa;
+      background: #183b27;
+    }
+
+    .pendiente {
+      color: #f3d08d;
+      background: #45351b;
+    }
+
     .mensaje {
       text-align: center;
       color: #bbbbbb;
@@ -93,7 +243,7 @@
     @media (max-width: 480px) {
       main {
         margin: 25px auto;
-        padding: 20px;
+        padding: 18px;
       }
 
       .tarjeta {
@@ -102,6 +252,14 @@
 
       .fila {
         font-size: 14px;
+      }
+
+      .pago-total .importe {
+        font-size: 22px;
+      }
+
+      .importe {
+        font-size: 16px;
       }
     }
   </style>
@@ -146,17 +304,34 @@
 
     const resultado = document.getElementById("resultado");
 
+    function crearElemento(tipo, clase, texto) {
+      const elemento = document.createElement(tipo);
+
+      if (clase) {
+        elemento.className = clase;
+      }
+
+      if (texto !== undefined) {
+        elemento.textContent = texto;
+      }
+
+      return elemento;
+    }
+
     function agregarFila(contenedor, etiqueta, valor) {
-      const fila = document.createElement("div");
-      fila.className = "fila";
+      const fila = crearElemento("div", "fila");
 
-      const izquierda = document.createElement("span");
-      izquierda.className = "etiqueta";
-      izquierda.textContent = etiqueta;
+      const izquierda = crearElemento(
+        "span",
+        "etiqueta",
+        etiqueta
+      );
 
-      const derecha = document.createElement("span");
-      derecha.className = "valor";
-      derecha.textContent = valor ?? "—";
+      const derecha = crearElemento(
+        "span",
+        "valor",
+        valor ?? "—"
+      );
 
       fila.append(izquierda, derecha);
       contenedor.appendChild(fila);
@@ -172,27 +347,372 @@
         : valor;
     }
 
+    function convertirFecha(valor) {
+      if (!valor) return null;
+
+      const partes = valor.split("-").map(Number);
+
+      if (
+        partes.length !== 3 ||
+        partes.some(numero => !Number.isFinite(numero))
+      ) {
+        return null;
+      }
+
+      const fechaUTC = new Date(
+        Date.UTC(partes[0], partes[1] - 1, partes[2])
+      );
+
+      if (
+        fechaUTC.getUTCFullYear() !== partes[0] ||
+        fechaUTC.getUTCMonth() !== partes[1] - 1 ||
+        fechaUTC.getUTCDate() !== partes[2]
+      ) {
+        return null;
+      }
+
+      return fechaUTC.getTime();
+    }
+
+    function hoyUruguay() {
+      const partes = new Intl.DateTimeFormat(
+        "en-CA",
+        {
+          timeZone: "America/Montevideo",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        }
+      ).formatToParts(new Date());
+
+      const obtener = tipo =>
+        Number(partes.find(parte => parte.type === tipo).value);
+
+      return Date.UTC(
+        obtener("year"),
+        obtener("month") - 1,
+        obtener("day")
+      );
+    }
+
+    function calcularProgreso(inicio, fin) {
+      const fechaInicio = convertirFecha(inicio);
+      const fechaFin = convertirFecha(fin);
+
+      if (
+        fechaInicio === null ||
+        fechaFin === null ||
+        fechaFin <= fechaInicio
+      ) {
+        return null;
+      }
+
+      const actual = hoyUruguay();
+
+      const porcentaje =
+        ((actual - fechaInicio) /
+          (fechaFin - fechaInicio)) * 100;
+
+      return Math.round(
+        Math.max(0, Math.min(100, porcentaje))
+      );
+    }
+
+    function moneda(valor) {
+      const numero = Number(valor);
+
+      if (!Number.isFinite(numero)) {
+        return "—";
+      }
+
+      return "$" + numero.toLocaleString(
+        "es-UY",
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }
+      );
+    }
+
+    function crearInsignia(pagado) {
+      return crearElemento(
+        "span",
+        "insignia " + (pagado ? "pagado" : "pendiente"),
+        pagado ? "PAGADO" : "PENDIENTE"
+      );
+    }
+
+    function crearFilaPago(
+      contenedor,
+      nombre,
+      descripcion,
+      importe,
+      pagado
+    ) {
+      const fila = crearElemento("div", "pago-fila");
+
+      const detalle = crearElemento(
+        "div",
+        "pago-detalle"
+      );
+
+      detalle.append(
+        crearElemento("span", "pago-nombre", nombre),
+        crearElemento(
+          "span",
+          "pago-descripcion",
+          descripcion
+        )
+      );
+
+      const derecha = crearElemento(
+        "div",
+        "pago-derecha"
+      );
+
+      derecha.append(
+        crearElemento(
+          "span",
+          "importe",
+          moneda(importe)
+        ),
+        crearInsignia(pagado)
+      );
+
+      fila.append(detalle, derecha);
+      contenedor.appendChild(fila);
+    }
+
+    function crearProgreso(pedido) {
+      const tarjeta = crearElemento(
+        "section",
+        "tarjeta"
+      );
+
+      tarjeta.appendChild(
+        crearElemento(
+          "h2",
+          "",
+          "Tiempo hasta la entrega"
+        )
+      );
+
+      const porcentaje = calcularProgreso(
+        pedido.fecha_pedido,
+        pedido.fecha_entrega
+      );
+
+      const progresoNumero = crearElemento(
+        "div",
+        "progreso-numero",
+        porcentaje === null
+          ? "—"
+          : porcentaje + "%"
+      );
+
+      const subtitulo = crearElemento(
+        "div",
+        "progreso-subtitulo",
+        "Del plazo estimado transcurrido"
+      );
+
+      const barraFondo = crearElemento(
+        "div",
+        "barra-fondo"
+      );
+
+      const barraRelleno = crearElemento(
+        "div",
+        "barra-relleno"
+      );
+
+      barraRelleno.style.width =
+        (porcentaje ?? 0) + "%";
+
+      barraFondo.appendChild(barraRelleno);
+
+      const fechas = crearElemento(
+        "div",
+        "fechas"
+      );
+
+      const inicio = crearElemento(
+        "div",
+        "fecha-bloque"
+      );
+
+      inicio.append(
+        crearElemento(
+          "span",
+          "fecha-etiqueta",
+          "Confirmación"
+        ),
+        crearElemento(
+          "span",
+          "fecha-valor",
+          fecha(pedido.fecha_pedido)
+        )
+      );
+
+      const fin = crearElemento(
+        "div",
+        "fecha-bloque"
+      );
+
+      fin.append(
+        crearElemento(
+          "span",
+          "fecha-etiqueta",
+          "Entrega estimada"
+        ),
+        crearElemento(
+          "span",
+          "fecha-valor",
+          fecha(pedido.fecha_entrega)
+        )
+      );
+
+      fechas.append(inicio, fin);
+
+      const aviso = crearElemento(
+        "p",
+        "aviso",
+        "La barra muestra el tiempo transcurrido " +
+        "hasta la fecha estimada de entrega. " +
+        "No representa el avance real de fabricación."
+      );
+
+      tarjeta.append(
+        progresoNumero,
+        subtitulo,
+        barraFondo,
+        fechas,
+        aviso
+      );
+
+      return tarjeta;
+    }
+
+    function crearResumenPago(pedido) {
+      const tarjeta = crearElemento(
+        "section",
+        "tarjeta"
+      );
+
+      tarjeta.appendChild(
+        crearElemento(
+          "h2",
+          "",
+          "Resumen de pago"
+        )
+      );
+
+      const total = Number(pedido.monto_total);
+
+      if (
+        pedido.monto_total === null ||
+        !Number.isFinite(total) ||
+        total <= 0
+      ) {
+        tarjeta.appendChild(
+          crearElemento(
+            "p",
+            "aviso",
+            "El importe del pedido todavía " +
+            "no fue cargado."
+          )
+        );
+
+        return tarjeta;
+      }
+
+      const sena = total / 2;
+      const resto = total - sena;
+
+      const senaPagada =
+        pedido.sena_pagada === true;
+
+      const saldoPagado =
+        pedido.saldo_pagado === true;
+
+      const totalFila = crearElemento(
+        "div",
+        "pago-total"
+      );
+
+      totalFila.append(
+        crearElemento(
+          "span",
+          "etiqueta",
+          "Total del pedido"
+        ),
+        crearElemento(
+          "span",
+          "importe",
+          moneda(total)
+        )
+      );
+
+      tarjeta.appendChild(totalFila);
+
+      crearFilaPago(
+        tarjeta,
+        "Seña (50%)",
+        "Primer pago del pedido",
+        sena,
+        senaPagada
+      );
+
+      crearFilaPago(
+        tarjeta,
+        "Pago final (50%)",
+        "A pagar en la entrega",
+        resto,
+        saldoPagado
+      );
+
+      const pendiente =
+        (senaPagada ? 0 : sena) +
+        (saldoPagado ? 0 : resto);
+
+      const filaPendiente = crearElemento(
+        "div",
+        "pago-total"
+      );
+
+      filaPendiente.style.borderBottom = "none";
+      filaPendiente.style.paddingTop = "23px";
+      filaPendiente.style.paddingBottom = "0";
+
+      filaPendiente.append(
+        crearElemento(
+          "span",
+          "etiqueta",
+          "Total pendiente de pago"
+        ),
+        crearElemento(
+          "span",
+          "importe",
+          moneda(pendiente)
+        )
+      );
+
+      tarjeta.appendChild(filaPendiente);
+
+      return tarjeta;
+    }
+
     async function consultarPedido() {
       const token = new URLSearchParams(
         window.location.search
       ).get("token");
 
-      // VALIDACION CORREGIDA DEL TOKEN
       const uuid =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
       if (!token || !uuid.test(token)) {
         resultado.textContent =
           "El enlace de seguimiento no es válido.";
-        return;
-      }
-
-      if (
-        SUPABASE_KEY ===
-        "PEGA_AQUI_TU_CLAVE_PUBLICABLE"
-      ) {
-        resultado.textContent =
-          "Falta configurar la clave publicable de Supabase.";
         return;
       }
 
@@ -212,7 +732,9 @@
         );
 
         if (!respuesta.ok) {
-          throw new Error("Error de consulta");
+          throw new Error(
+            "Error de consulta: " + respuesta.status
+          );
         }
 
         const datos = await respuesta.json();
@@ -224,52 +746,82 @@
           return;
         }
 
-        const tarjeta = document.createElement("div");
-        tarjeta.className = "tarjeta";
+        const contenido = crearElemento(
+          "div",
+          ""
+        );
+
+        const tarjetaDatos = crearElemento(
+          "section",
+          "tarjeta"
+        );
+
+        tarjetaDatos.appendChild(
+          crearElemento(
+            "h2",
+            "",
+            "Información del pedido"
+          )
+        );
 
         agregarFila(
-          tarjeta,
+          tarjetaDatos,
           "Cliente",
           pedido.cliente
         );
 
         agregarFila(
-          tarjeta,
+          tarjetaDatos,
           "N.º de pedido",
           pedido.numero_pedido
         );
 
         agregarFila(
-          tarjeta,
+          tarjetaDatos,
           "Productos",
           pedido.productos
         );
 
-        agregarFila(
-          tarjeta,
-          "Estado",
-          pedido.estado
+        const filaEstado = crearElemento(
+          "div",
+          "fila"
         );
 
-        agregarFila(
-          tarjeta,
-          "Fecha del pedido",
-          fecha(pedido.fecha_pedido)
+        filaEstado.appendChild(
+          crearElemento(
+            "span",
+            "etiqueta",
+            "Estado"
+          )
         );
 
-        agregarFila(
-          tarjeta,
-          "Entrega estimada",
-          fecha(pedido.fecha_entrega)
+        filaEstado.appendChild(
+          crearElemento(
+            "span",
+            "estado",
+            pedido.estado || "—"
+          )
         );
 
-        resultado.replaceWith(tarjeta);
+        tarjetaDatos.appendChild(filaEstado);
+
+        contenido.append(
+          tarjetaDatos,
+          crearProgreso(pedido),
+          crearResumenPago(pedido)
+        );
+
+        resultado.replaceWith(contenido);
 
       } catch (error) {
-        console.error("Error al consultar:", error);
+        console.error(
+          "Error al consultar:",
+          error
+        );
 
         resultado.textContent =
-          "No pudimos consultar el pedido. Intentá nuevamente.";
+          "No pudimos consultar el pedido. " +
+          "Intentá nuevamente.";
       }
     }
 
