@@ -232,6 +232,19 @@
       text-align: center;
       color: #bbbbbb;
       line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .error-detalle {
+      margin-top: 15px;
+      padding: 12px;
+      border: 1px solid #633333;
+      border-radius: 8px;
+      background: #291818;
+      color: #ffb4b4;
+      font-size: 12px;
+      text-align: left;
+      overflow-wrap: anywhere;
     }
 
     footer {
@@ -295,12 +308,15 @@
 
   <script>
     // LOGO OFICIAL DE TORO SPORTS
+
     const nombreLogo = "New Logo blanco (1).png";
 
     document.getElementById("logo-toro").src =
       "./" + encodeURIComponent(nombreLogo);
 
+
     // CONEXION CON SUPABASE
+
     const SUPABASE_URL =
       "https://naxhcvjrxhirfizhitsp.supabase.co";
 
@@ -308,6 +324,9 @@
       "sb_publishable_sFSH8qeq6HweNdtkZJ8AmA_kUUhghEj";
 
     const resultado = document.getElementById("resultado");
+
+
+    // CREAR ELEMENTOS
 
     function crearElemento(tipo, clase, texto) {
       const elemento = document.createElement(tipo);
@@ -322,6 +341,9 @@
 
       return elemento;
     }
+
+
+    // FILAS DE INFORMACION
 
     function agregarFila(contenedor, etiqueta, valor) {
       const fila = crearElemento("div", "fila");
@@ -342,6 +364,9 @@
       contenedor.appendChild(fila);
     }
 
+
+    // FORMATO DE FECHA
+
     function fecha(valor) {
       if (!valor) return "—";
 
@@ -351,6 +376,9 @@
         ? `${partes[2]}/${partes[1]}/${partes[0]}`
         : valor;
     }
+
+
+    // CONVERTIR FECHAS
 
     function convertirFecha(valor) {
       if (!valor) return null;
@@ -379,6 +407,9 @@
       return fechaUTC.getTime();
     }
 
+
+    // FECHA ACTUAL DE URUGUAY
+
     function hoyUruguay() {
       const partes = new Intl.DateTimeFormat(
         "en-CA",
@@ -402,6 +433,9 @@
       );
     }
 
+
+    // PROGRESO DE LA BARRA
+
     function calcularProgreso(inicio, fin) {
       const fechaInicio = convertirFecha(inicio);
       const fechaFin = convertirFecha(fin);
@@ -418,12 +452,15 @@
 
       const porcentaje =
         ((actual - fechaInicio) /
-          (fechaFin - fechaInicio)) * 100;
+        (fechaFin - fechaInicio)) * 100;
 
       return Math.round(
         Math.max(0, Math.min(100, porcentaje))
       );
     }
+
+
+    // DIAS RESTANTES
 
     function calcularDiasRestantes(fechaEntrega) {
       const entrega = convertirFecha(fechaEntrega);
@@ -451,6 +488,9 @@
       return "Fecha estimada superada";
     }
 
+
+    // FORMATO DE MONEDA
+
     function moneda(valor) {
       const numero = Number(valor);
 
@@ -467,6 +507,9 @@
       );
     }
 
+
+    // INSIGNIAS DE PAGO
+
     function crearInsignia(pagado) {
       return crearElemento(
         "span",
@@ -474,6 +517,9 @@
         pagado ? "PAGADO" : "PENDIENTE"
       );
     }
+
+
+    // FILAS DE PAGO
 
     function crearFilaPago(
       contenedor,
@@ -515,6 +561,9 @@
       fila.append(detalle, derecha);
       contenedor.appendChild(fila);
     }
+
+
+    // TARJETA DE PROGRESO
 
     function crearProgreso(pedido) {
       const tarjeta = crearElemento(
@@ -605,6 +654,8 @@
 
       fechas.append(inicio, fin);
 
+      // SIN TEXTO EXPLICATIVO DEBAJO DE LA BARRA
+
       tarjeta.append(
         progresoNumero,
         subtitulo,
@@ -614,6 +665,9 @@
 
       return tarjeta;
     }
+
+
+    // RESUMEN DE PAGOS
 
     function crearResumenPago(pedido) {
       const tarjeta = crearElemento(
@@ -640,8 +694,7 @@
           crearElemento(
             "p",
             "aviso",
-            "El importe del pedido todavía " +
-            "no fue cargado."
+            "El importe del pedido todavía no fue cargado."
           )
         );
 
@@ -724,12 +777,16 @@
       return tarjeta;
     }
 
+
+    // CONSULTAR PEDIDO EN SUPABASE
+
     async function consultarPedido() {
       const token = new URLSearchParams(
         window.location.search
       ).get("token");
 
-      // VALIDACION CORRECTA DEL TOKEN UUID
+      // VALIDACION UUID CORREGIDA
+
       const uuid =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -754,20 +811,30 @@
           }
         );
 
+        // MOSTRAR ERROR REAL SI SUPABASE FALLA
+
         if (!respuesta.ok) {
+          const detalle = await respuesta.text();
+
           throw new Error(
-            "Error de consulta: " + respuesta.status
+            "HTTP " + respuesta.status + ": " + detalle
           );
         }
 
         const datos = await respuesta.json();
-        const pedido = datos[0];
+
+        const pedido = Array.isArray(datos)
+          ? datos[0]
+          : datos;
 
         if (!pedido) {
           resultado.textContent =
             "No encontramos un pedido con este enlace.";
           return;
         }
+
+
+        // INFORMACION DEL PEDIDO
 
         const contenido = crearElemento(
           "div",
@@ -828,6 +895,9 @@
 
         tarjetaDatos.appendChild(filaEstado);
 
+
+        // ARMAR PAGINA
+
         contenido.append(
           tarjetaDatos,
           crearProgreso(pedido),
@@ -843,12 +913,26 @@
         );
 
         resultado.textContent =
-          "No pudimos consultar el pedido. " +
-          "Intentá nuevamente.";
+          "No pudimos consultar el pedido.";
+
+        // DETALLE TEMPORAL PARA IDENTIFICAR EL ERROR
+        // QUITAR CUANDO TODO FUNCIONE
+
+        const detalleError = crearElemento(
+          "div",
+          "error-detalle",
+          error.message || "Error desconocido"
+        );
+
+        resultado.appendChild(detalleError);
       }
     }
 
+
+    // INICIAR CONSULTA
+
     consultarPedido();
+
   </script>
 </body>
 </html>
